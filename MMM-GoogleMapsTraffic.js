@@ -19,10 +19,11 @@
         mapTypeId: 'roadmap',
         styledMapType: 'standard',
         disableDefaultUI: true,
-        updateInterval: 5000,
+        updateInterval: 300000,
         backgroundColor: 'rgba(0, 0, 0, 0)'
     },
     distanceResponse : [],
+    latestRequestTime: new Date(),
 
     start: function() {
         var self = this;
@@ -34,7 +35,7 @@
         }
 
         this.sendSocketNotification("MMM-GOOGLE_MAPS_TRAFFIC-GET", {style: this.config.styledMapType});
-
+        this.executeMapsRequest();
         setInterval(function() {
             self.executeMapsRequest();
         }, this.config.updateInterval);
@@ -58,6 +59,7 @@
             unitSystem: google.maps.UnitSystem.IMPERIAL,
         }, (response, status) => {
             this.distanceResponse = response;
+            this.latestRequestTime = new Date();
             this.updateDom()
             }
         );
@@ -68,7 +70,7 @@
         wrapper.classList.add("medium");
         if (this.distanceResponse.length < 1) return wrapper;
         var travelTime = this.distanceResponse.rows[0].elements[0].duration.text;
-        wrapper.innerHTML = `<span>It is currently ${travelTime} to work.</span>`;
+        wrapper.innerHTML = `<span>It is currently ${travelTime} to work.               Last Checked: ${this.latestRequestTime.toLocaleTimeString('en-US')}</span>`;
 
         console.log("here")
         return wrapper;
