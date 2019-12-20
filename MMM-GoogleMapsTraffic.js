@@ -46,16 +46,18 @@
 
         var service = new google.maps.DistanceMatrixService();
         var transitOptions = {
-            departureTime: new Date(),
-            modes: ['BUS']
+            departureTime: new Date(Date.now() + 1000000),
         }
         var self = this;
         service.getDistanceMatrix(
         {
             origins: [origin1],
             destinations: [destinationA],
-            travelMode: 'DRIVING',
+					  drivingOptions: {
+            departureTime: new Date(Date.now() + 1000000),
+					 },
             transitOptions: transitOptions,
+						travelMode: 'DRIVING',
             unitSystem: google.maps.UnitSystem.IMPERIAL,
         }, (response, status) => {
             this.distanceResponse = response;
@@ -69,19 +71,10 @@
         var wrapper = document.createElement("div");
         wrapper.classList.add("medium");
         if (this.distanceResponse.length < 1) return wrapper;
-        var travelTime = this.distanceResponse.rows[0].elements[0].duration.text;
+        var travelTime = this.distanceResponse.rows[0].elements[0].duration_in_traffic.text;
         wrapper.innerHTML = `<span>It is currently ${travelTime} to work.               Last Checked: ${this.latestRequestTime.toLocaleTimeString('en-US')}</span>`;
-
-        console.log("here")
         return wrapper;
-    },
-    callback(response, status) {
-  // See Parsing the Results for
-  // the basics of a callback function.
-  debugger;
-  this.updateDom();
-
-}, 
+    }, 
 
 
 	// socketNotificationReceived from helper
